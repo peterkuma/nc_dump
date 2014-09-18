@@ -1,6 +1,6 @@
 !OPTIONS XOPT(NOEVAL)
 
-subroutine acraneb_dump(group, name, offset, data)
+subroutine nc_dump(group, name, offset, data)
     USE PARKIND1  ,ONLY : JPIM    ,JPRB
     USE YOMPHY    ,ONLY : LRNUMX
     USE YOMHOOK   ,ONLY : LHOOK   ,DR_HOOK
@@ -24,24 +24,24 @@ subroutine acraneb_dump(group, name, offset, data)
 
     #include "abor1.intfb.h"
 
-    IF (LHOOK) CALL DR_HOOK('ACRANEB_DUMP',0,ZHOOK_HANDLE)
+    IF (LHOOK) CALL DR_HOOK('NC_DUMP',0,ZHOOK_HANDLE)
 
     if (size(data) == 0) return ! Nothing to do.
 
     f = UNIT + oml_my_thread() ! We need this to be reentrant.
     write(filename,'(A)') group//'/'//name
 
-    write(*,'(A,A,A,I3,A)') 'acraneb_dump: ', trim(filename), ' thread ', oml_my_thread(), ' started'
+    write(*,'(A,A,A,I3,A)') 'nc_dump: ', trim(filename), ' thread ', oml_my_thread(), ' started'
 
     inquire(file=trim(filename), exist=exist)
     if (.not. exist) then
-        write(errmsg,'(A,A,A)') 'acraneb_dump: No such dataset "', trim(filename), '"'
+        write(errmsg,'(A,A,A)') 'nc_dump: No such dataset "', trim(filename), '"'
         call abor1(errmsg)
     end if
 
     inquire(unit=f, opened=opened)
     if (opened) then
-        write(errmsg,'(A,I3,A)') 'acraneb_dump: Unit ', f, ' is in use'
+        write(errmsg,'(A,I3,A)') 'nc_dump: Unit ', f, ' is in use'
         call abor1(errmsg)
     end if
 
@@ -74,7 +74,7 @@ subroutine acraneb_dump(group, name, offset, data)
     end do
 
     if (mod(off, size(data)) /= 0) then
-        call abor1('acraneb_dump: Data size does not match sub-block size')
+        call abor1('nc_dump: Data size does not match sub-block size')
     end if
 
     ! Write data.
@@ -88,11 +88,11 @@ subroutine acraneb_dump(group, name, offset, data)
     deallocate(block_size)
     deallocate(dims)
 
-    write(*,'(A,A,A,I3,A)') 'acraneb_dump: ', trim(filename), ' thread ', oml_my_thread(), ' finished'
-    IF (LHOOK) CALL DR_HOOK('ACRANEB_DUMP',1,ZHOOK_HANDLE)
+    write(*,'(A,A,A,I3,A)') 'nc_dump: ', trim(filename), ' thread ', oml_my_thread(), ' finished'
+    IF (LHOOK) CALL DR_HOOK('NC_DUMP',1,ZHOOK_HANDLE)
 end subroutine
 
-subroutine acraneb_dataset(group, name, title, units, dtype, dims)
+subroutine nc_dataset(group, name, title, units, dtype, dims)
     USE PARKIND1  ,ONLY : JPIM    ,JPRB
     USE YOMPHY    ,ONLY : LRNUMX
     USE YOMHOOK   ,ONLY : LHOOK   ,DR_HOOK
@@ -114,21 +114,21 @@ subroutine acraneb_dataset(group, name, title, units, dtype, dims)
     character(len=512) :: errmsg
 
     REAL(KIND=JPRB) :: ZHOOK_HANDLE
-    IF (LHOOK) CALL DR_HOOK('ACRANEB_DATASET',0,ZHOOK_HANDLE)
+    IF (LHOOK) CALL DR_HOOK('NC_DATASET',0,ZHOOK_HANDLE)
 
     f = UNIT + oml_my_thread() ! We need this to be reentrant.
     write(filename,'(A)') group//'/'//name
 
     inquire(unit=f, opened=opened)
     if (opened) then
-        write(errmsg,'(A,I3,A)') 'acraneb_dataset: Unit ', f, ' is in use'
+        write(errmsg,'(A,I3,A)') 'nc_dataset: Unit ', f, ' is in use'
         call abor1(errmsg)
     end if
 
     inquire(file=trim(filename), exist=exist)
     if (exist) return ! Dataset already exists (assumed), do nothing.
 
-    write(*,'(A,A,A,I3,A)') 'acraneb_dataset: ', trim(filename), ' thread ', oml_my_thread(), ' started'
+    write(*,'(A,A,A,I3,A)') 'nc_dataset: ', trim(filename), ' thread ', oml_my_thread(), ' started'
 
     call system('mkdir -p `dirname "    '//trim(filename)//'"`')
 
@@ -155,6 +155,6 @@ subroutine acraneb_dataset(group, name, title, units, dtype, dims)
     open(unit=f, file=trim(filename)//'.units', status='replace')
     write(f,'(A)') units
     close(f)
-    write(*,'(A,A,A,I3,A)')  'acraneb_dataset: ', trim(filename), ' thread ', oml_my_thread(), ' finished'
-    IF (LHOOK) CALL DR_HOOK('ACRANEB_DATASET',1,ZHOOK_HANDLE)
+    write(*,'(A,A,A,I3,A)')  'nc_dataset: ', trim(filename), ' thread ', oml_my_thread(), ' finished'
+    IF (LHOOK) CALL DR_HOOK('NC_DATASET',1,ZHOOK_HANDLE)
 end subroutine

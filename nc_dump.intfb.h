@@ -1,5 +1,5 @@
 interface
-    subroutine acraneb_dump(group, name, offset, data)
+    subroutine nc_dump(group, name, offset, data)
         USE PARKIND1,ONLY : JPRB
         character(len=*), intent(in) :: group
         character(len=*), intent(in) :: name
@@ -7,7 +7,7 @@ interface
         real(kind=JPRB), dimension(:), intent(in) :: data
     end subroutine
 
-    subroutine acraneb_dataset(group, name, title, units, dtype, dims)
+    subroutine nc_dataset(group, name, title, units, dtype, dims)
         character(len=*), intent(in) :: group
         character(len=*), intent(in) :: name
         character(len=*), intent(in) :: title
