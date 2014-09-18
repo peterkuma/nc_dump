@@ -10,10 +10,23 @@ Usage
 1. Copy `nc_dump.intfb.h` to `Arp/interfaces` and `nc_dump.F90` to
    `Arp/phys_dmn`.
 
-2. Initialize datasets in `Arp/adiab/cpg.F90`, e.g.:
+2. **Optional:** Apply patch `latitude.diff` is you want to dump latitude.
+   This will ensure `PGELAT` is passed from cpg down to aplpar.
+   In the main directory, do:
+
+        patch < latitude.diff
+
+3. Initialize desired datasets in `Arp/adiab/cpg.F90` (single-threaded).
+   Example:
 
     ~~~fortran
+    ! Import RSTATI if you want to dump time.
+    USE YOMRIP   , ONLY : RSTATI
+    ...
+
+    ! Declaration of local variables.
     INTEGER :: N_DUMP_POINTS ! Number of data points to dump per NPROMA block.
+    INTEGER :: DUMP_DIMS1(1) ! Dimensions specification for 1D arrays.
     INTEGER :: DUMP_DIMS2(2) ! Dimensions specification for 2D arrays.
     INTEGER :: DUMP_DIMS3_HALF(3) ! Dimensions spec. for 3D arrays (half lev.).
     INTEGER :: DUMP_DIMS3_FULL(3) ! Dimensions spec. for 3D arrays (full lev.).
@@ -58,17 +71,22 @@ Usage
     CALL NC_DATASET('radiation', 'pressure', &
      & TITLE='Pressure', UNITS='Pa', &
      & DTYPE='float64', DIMS=DUMP_DIMS3_FULL)
+
+    ! Dump time.
+    CALL NC_DUMP('radiation', 'time', (/ NSTEP+1 /), (/ RSTATI /))
     ~~~
 
-3. Dump datasets anywhere in the code:
+4. Dump datasets in `aplpar.F90`:
 
     ~~~fortran
-    #include "nc_dump.intfb.h"
-    ...
-
-    ! Declaration of variables.
+    ! Declaration of local variables.
+    INTEGER :: N_DUMP_POINTS ! Number of data points to dump per NPROMA block.
+    INTEGER, ALLOCATABLE :: DUMP_POINTS(:)
     INTEGER :: DUMP_OFFSET1(1) ! Offset for 1D arrays.
     INTEGER :: DUMP_OFFSET2(2) ! Offset for 2D & 3D arrays.
+    ...
+
+    #include "nc_dump.intfb.h"
     ...
 
     N_DUMP_POINTS=2 ! Dump only limited number of data points per NPROMA block.
@@ -79,9 +97,6 @@ Usage
 
     ! 2D & 3D arrays: time step, offset of the NPROMA block.
     DUMP_OFFSET2=(/ KSTEP+1, (KBL-1)*N_DUMP_POINTS+1 /)
-
-    ! 1D array: time.
-    CALL NC_DUMP('radiation', 'time', (/ NSTEP+1 /), (/ RSTATI /))
 
     ! 1D arrays, independed of time.
     IF (KSTEP == 0) THEN
