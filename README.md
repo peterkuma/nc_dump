@@ -2,7 +2,7 @@ nc_dump
 =======
 
 Dump arrays to [netcdf](http://www.unidata.ucar.edu/software/netcdf/)
-in ALADIN/ACRANEB numerical weather prediction models.
+in ALADIN numerical weather prediction models.
 
 Usage
 -----
