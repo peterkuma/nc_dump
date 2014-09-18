@@ -34,6 +34,11 @@ Usage
     DUMP_DIMS3_HALF=(/ -1, CEILING(1.0*KGPCOMP/NPROMA)*N_DUMP_POINTS, (NFLEVG+1) /)
     DUMP_DIMS3_FULL=(/ -1, CEILING(1.0*KGPCOMP/NPROMA)*N_DUMP_POINTS, NFLEVG /)
 
+    ! 1D array: time.
+    CALL NC_DATASET('radiation', 'time', &
+     & TITLE='Time', UNITS='s', &
+     & DTYPE='float64', DIMS=(/ -1 /))
+
     ! 1D array: latitude (lon).
     CALL NC_DATASET('radiation', 'latitude', &
      & TITLE='Latitude', UNITS='degree', &
@@ -55,7 +60,7 @@ Usage
      & DTYPE='float64', DIMS=DUMP_DIMS3_FULL)
     ~~~
 
-3. Dump dataset anywhere in the code.
+3. Dump datasets anywhere in the code:
 
     ~~~fortran
     #include "nc_dump.intfb.h"
@@ -74,6 +79,9 @@ Usage
 
     ! 2D & 3D arrays: time step, offset of the NPROMA block.
     DUMP_OFFSET2=(/ KSTEP+1, (KBL-1)*N_DUMP_POINTS+1 /)
+
+    ! 1D array: time.
+    CALL NC_DUMP('radiation', 'time', (/ NSTEP+1 /), (/ RSTATI /))
 
     ! 1D arrays, independed of time.
     IF (KSTEP == 0) THEN
