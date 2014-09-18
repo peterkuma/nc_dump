@@ -12,6 +12,7 @@ Usage
 
 2. Initialize datasets in `Arp/adiab/cpg.F90`, e.g.:
 
+    ~~~fortran
     INTEGER :: N_DUMP_POINTS ! Number of data points to dump per NPROMA block.
     INTEGER :: DUMP_DIMS2(2) ! Dimensions specification for 2D arrays.
     INTEGER :: DUMP_DIMS3_HALF(3) ! Dimensions spec. for 3D arrays (half lev.).
@@ -22,10 +23,10 @@ Usage
     ...
 
     N_DUMP_POINTS=2 ! Dump only limited number of data points per NPROMA block.
-    
+
     ! Dimensions of 1D arrays.
     DUMP_DIMS1=(/ CEILING(1.0*KGPCOMP/NPROMA)*N_DUMP_POINTS /)
-    
+
     ! Dimensions of 2D arrays. -1 allows for arbitrary number of time steps.
     DUMP_DIMS2=(/ -1, CEILING(1.0*KGPCOMP/NPROMA)*N_DUMP_POINTS /)
 
@@ -37,7 +38,7 @@ Usage
     CALL NC_DATASET('radiation', 'latitude', &
      & TITLE='Latitude', UNITS='degree', &
      & DTYPE='float64', DIMS=DUMP_DIMS1)
-    
+
     ! 1D array: longitude (lon).
     CALL NC_DATASET('radiation', 'longitude', &
      & TITLE='Longitude', UNITS='degree', &
@@ -52,9 +53,11 @@ Usage
     CALL NC_DATASET('radiation', 'pressure', &
      & TITLE='Pressure', UNITS='Pa', &
      & DTYPE='float64', DIMS=DUMP_DIMS3_FULL)
+    ~~~
 
 3. Dump dataset anywhere in the code.
 
+    ~~~fortran
     #include "nc_dump.intfb.h"
     ...
 
@@ -90,10 +93,12 @@ Usage
     ! Dump pressure (PAPRSF).
     CALL NC_DUMP('radiation', 'pressure', DUMP_OFFSET2, &
      & PACK(TRANSPOSE(PAPRSF(DUMP_POINTS,:)), .TRUE.))
+    ~~~
 
 4. Copy the resulting datasets to a local directory after the model is run,
    e.g. for dataset group named `radiation` (in Perl task script):
 
+    ~~~perl
     foreach $file ( <ICMSH$exp+????>, <DHFDL$exp+????>, <radiation/*> ) {
       print "Copying $file to $OUTPUT/$file\n";
       $dir = dirname("$OUTPUT/$file");
@@ -105,6 +110,7 @@ Usage
         "$file -> $OUTPUT/$file",
       );
     }
+    ~~~
 
 5. Use [dump2h5](https://github.com/peterkuma/dump2h5) to convert
    raw dataset files to HDF5.
@@ -114,14 +120,16 @@ API
 
 ### nc_dataset
 
-    subroutine nc_dataset(group, name, title, units, dtype, dims)
+~~~fortran
+subroutine nc_dataset(group, name, title, units, dtype, dims)
 
-    character(len=*), intent(in) :: group
-    character(len=*), intent(in) :: name
-    character(len=*), intent(in) :: title
-    character(len=*), intent(in) :: units
-    character(len=*), intent(in) :: dtype
-    integer, dimension(:), intent(in) :: dims
+character(len=*), intent(in) :: group
+character(len=*), intent(in) :: name
+character(len=*), intent(in) :: title
+character(len=*), intent(in) :: units
+character(len=*), intent(in) :: dtype
+integer, dimension(:), intent(in) :: dims
+~~~
 
 Initialize dataset `name` in group `group`. `title` is a human-readable
 title of the dataset, `units` are the units of data values, `dtype`
@@ -138,12 +146,14 @@ case the size along the first dimension is determined automatically.
 
 ### nc_dump
 
-    subroutine nc_dump(group, name, offset, data)
+~~~fortran
+subroutine nc_dump(group, name, offset, data)
 
-    character(len=*), intent(in) :: group
-    character(len=*), intent(in) :: name
-    integer, dimension(:), intent(in) :: offset
-    real(kind=JPRB), dimension(:), intent(in) :: data
+character(len=*), intent(in) :: group
+character(len=*), intent(in) :: name
+integer, dimension(:), intent(in) :: offset
+real(kind=JPRB), dimension(:), intent(in) :: data
+~~~
 
 Dump data `data` to dataset `name` in group `group`. `offset` is an array
 specifying the offset along each dimension where data is to be saved.
