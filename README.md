@@ -159,8 +159,3 @@ Dump data `data` to dataset `name` in group `group`. `offset` is an array
 specifying the offset along each dimension where data is to be saved.
 `data` is a one-dimensional array. To save multi-dimensional data arrays,
 flatten the dimensions with `PACK(data, .TRUE.)` when passing to `nc_dump`.
-
-Bugs
-----
-
-Please report bugs to Peter Kuma <peterkuma@waveland.org>.
