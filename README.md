@@ -79,6 +79,10 @@ Usage
 4. Dump datasets in `aplpar.F90`:
 
     ~~~fortran
+    ! Import constants.
+    USE YOMCST, ONLY : RPI
+    ...
+
     ! Declaration of local variables.
     INTEGER :: N_DUMP_POINTS ! Number of data points to dump per NPROMA block.
     INTEGER, ALLOCATABLE :: DUMP_POINTS(:)
@@ -101,9 +105,9 @@ Usage
     ! 1D arrays, independed of time.
     IF (KSTEP == 0) THEN
       ! Dump latitude (PGELAT).
-      CALL NC_DUMP('radiation', 'latitude', DUMP_OFFSET1, PGELAT(DUMP_POINTS)*180.0/PI)
+      CALL NC_DUMP('radiation', 'latitude', DUMP_OFFSET1, ASIN(PGEMU(DUMP_POINTS))*180.0/RPI)
       ! Dump longitude (PGELAM).
-      CALL NC_DUMP('radiation', 'longitude', DUMP_OFFSET1, PGELAM(DUMP_POINTS)*180.0/PI)
+      CALL NC_DUMP('radiation', 'longitude', DUMP_OFFSET1, PGELAM(DUMP_POINTS)*180.0/RPI)
     END IF
 
     ! 2D arrays.
