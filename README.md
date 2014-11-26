@@ -10,13 +10,7 @@ Usage
 1. Copy `nc_dump.intfb.h` to `Arp/interfaces` and `nc_dump.F90` to
    `Arp/phys_dmn`.
 
-2. **Optional:** Apply patch `latitude.diff` is you want to dump latitude.
-   This will ensure `PGELAT` is passed from cpg down to aplpar.
-   In the main directory, do:
-
-        patch < latitude.diff
-
-3. Initialize desired datasets in `Arp/adiab/cpg.F90` (single-threaded).
+2. Initialize desired datasets in `Arp/adiab/cpg.F90` (single-threaded).
    Example:
 
     ~~~fortran
@@ -76,7 +70,7 @@ Usage
     CALL NC_DUMP('radiation', 'time', (/ NSTEP+1 /), (/ RSTATI /))
     ~~~
 
-4. Dump datasets in `aplpar.F90`:
+3. Dump datasets in `aplpar.F90`:
 
     ~~~fortran
     ! Import constants.
@@ -104,7 +98,7 @@ Usage
 
     ! 1D arrays, independed of time.
     IF (KSTEP == 0) THEN
-      ! Dump latitude (PGELAT).
+      ! Dump latitude (calculated from PGEMU).
       CALL NC_DUMP('radiation', 'latitude', DUMP_OFFSET1, ASIN(PGEMU(DUMP_POINTS))*180.0/RPI)
       ! Dump longitude (PGELAM).
       CALL NC_DUMP('radiation', 'longitude', DUMP_OFFSET1, PGELAM(DUMP_POINTS)*180.0/RPI)
