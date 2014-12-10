@@ -99,9 +99,12 @@ Usage
     ! 1D arrays, independed of time.
     IF (KSTEP == 0) THEN
       ! Dump latitude (calculated from PGEMU).
-      CALL NC_DUMP('radiation', 'latitude', DUMP_OFFSET1, ASIN(PGEMU(DUMP_POINTS))*180.0/RPI)
+      CALL NC_DUMP('radiation', 'latitude', DUMP_OFFSET1, &
+       & ASIN(PGEMU(DUMP_POINTS))*180.0/RPI)
+       
       ! Dump longitude (PGELAM).
-      CALL NC_DUMP('radiation', 'longitude', DUMP_OFFSET1, PGELAM(DUMP_POINTS)*180.0/RPI)
+      CALL NC_DUMP('radiation', 'longitude', DUMP_OFFSET1, &
+       & PGELAM(DUMP_POINTS)*180.0/RPI)
     END IF
 
     ! 2D arrays.
